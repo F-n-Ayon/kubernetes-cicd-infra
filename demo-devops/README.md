@@ -1,16 +1,17 @@
 # DevOps Demonstration Project - Development Environment
 
 A secure, production-ready Kubernetes infrastructure for development environment with CI/CD pipeline, RDS database, and Grafana monitoring.
-## 🗂️ Project Structure
 
+🗂️ Project Structure
+```
 devops-demonstration-project/
 ├── terraform/           # Infrastructure as Code
-├── kubernetes/          # Kubernetes manifests
-├── ci-cd/               # GitHub Actions workflows
-├── scripts/             # Utility scripts
-├── monitoring/          # Grafana dashboards
-└── docs/                #
-
+├── kubernetes/         # Kubernetes manifests
+├── ci-cd/             # GitHub Actions workflows
+├── scripts/           # Utility scripts
+├── monitoring/        # Grafana dashboards
+└── docs/             # Documentation
+```
 ## 🏗️ Architecture
 <img width="1167" height="317" alt="image" src="https://github.com/user-attachments/assets/38f9c514-2c98-4dd5-9c5d-e24503a8a9d8" />
 
