@@ -64,14 +64,29 @@ demo-devops/
    ```bash
    aws configure
    ```
-
-3. **Deploy development environment**
-   ```bash
-   ./scripts/setup.sh
+3. **Deploy infrastructure**
+      ```bash
+   cd terraform/environments/dev
+   terraform init
+   terraform plan -var-file=dev.tfvars
+   terraform apply -var-file=dev.tfvars
    ```
 
-### Access Monitoring
+4.  **Configure kubectl**
+      ```bash
+      aws eks update-kubeconfig --region us-west-2 --name demo-devops-dev
+    
+5.  **Deploy application and monitoring**
+      ```bash
+      ./scripts/setup.sh
+      ./scripts/monitoring-test.sh
+     ```
 
+
+
+
+
+### Access Monitoring
 #### Access Grafana
 ```bash
 kubectl port-forward svc/grafana -n monitoring 3000:3000
@@ -81,6 +96,9 @@ kubectl port-forward svc/grafana -n monitoring 3000:3000
 ```bash
 kubectl port-forward svc/prometheus-server -n monitoring 9090:9090
 ```
+
+
+
 
 ## 🔒 Security Features
 
@@ -93,12 +111,6 @@ kubectl port-forward svc/prometheus-server -n monitoring 9090:9090
 - **Network Policies**: Zero-trust networking within cluster
 - **Latest Versions**: All components use latest stable versions
 
-### Regular Security Tasks
-
-Run security audit:
-```bash
-./scripts/security-audit.sh
-```
 
 ## 📊 Monitoring
 
