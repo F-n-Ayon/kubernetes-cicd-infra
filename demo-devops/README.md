@@ -128,19 +128,7 @@ kubectl port-forward svc/prometheus-server -n monitoring 9090:9090
 - Pod performance metrics
 - Custom application metrics
 
-## 🔧 Maintenance
 
-### Database Operations
-
-Initialize database:
-```bash
-./scripts/init-database.sh
-```
-
-Test database connection:
-```bash
-./scripts/test-database-connection.sh
-```
 
 ### Troubleshooting
 
