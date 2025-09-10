@@ -1,32 +1,3 @@
-terraform {
-  required_version = ">= 1.0"
-
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.0"
-    }
-  }
-
-  backend "s3" {
-    bucket         = "your-terraform-state-bucket"
-    key            = "dev/terraform.tfstate"
-    region         = "us-west-2"
-    encrypt        = true
-    dynamodb_table = "terraform-lock-table"
-  }
-}
-
-provider "aws" {
-  region = "us-west-2"
-}
-
-provider "random" {}
-
 variable "environment" {
   description = "Environment name"
   type        = string
@@ -40,10 +11,9 @@ variable "db_username" {
 }
 
 variable "db_password" {
-  description = "Database password (optional - will generate if not provided)"
+  description = "Database password"
   type        = string
   sensitive   = true
-  default     = ""
 }
 
 module "vpc" {
@@ -69,30 +39,46 @@ module "eks" {
 module "rds" {
   source = "../../modules/rds"
 
-  cluster_name      = "demo-devops-${var.environment}"
-  vpc_id            = module.vpc.vpc_id
-  private_subnets   = module.vpc.private_subnets
-  environment       = var.environment
-  db_name           = "appdb"
-  db_username       = var.db_username
-  db_password       = var.db_password
+  cluster_name     = "demo-devops-${var.environment}"
+  vpc_id           = module.vpc.vpc_id
+  private_subnets  = module.vpc.private_subnets
+  environment      = var.environment
+  db_name          = "appdb"
+  db_username      = var.db_username
+  db_password      = var.db_password
   db_instance_class = "db.t3.micro"
+}
+
+module "secrets_manager" {
+  source = "../../modules/secrets-manager"
+
+  cluster_name = "demo-devops-${var.environment}"
+  environment  = var.environment
+  db_username  = var.db_username
+  db_password  = var.db_password
+  db_host      = module.rds.db_instance_endpoint
+  db_port      = "5432"
+  db_name      = "appdb"
+
+  depends_on = [module.eks, module.rds]
 }
 
 output "cluster_endpoint" {
   description = "EKS cluster endpoint"
   value       = module.eks.cluster_endpoint
-  sensitive   = false
 }
 
 output "db_instance_endpoint" {
   description = "RDS instance endpoint"
   value       = module.rds.db_instance_endpoint
-  sensitive   = false
 }
 
 output "db_secret_arn" {
   description = "Secrets Manager secret ARN"
-  value       = module.rds.db_secret_arn
-  sensitive   = false
+  value       = module.secrets_manager.db_secret_arn
+}
+
+output "irsa_role_arn" {
+  description = "IRSA role ARN"
+  value       = module.secrets_manager.irsa_role_arn
 }

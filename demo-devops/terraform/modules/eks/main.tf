@@ -27,7 +27,7 @@ variable "region" {
 resource "aws_eks_cluster" "main" {
   name     = var.cluster_name
   role_arn = aws_iam_role.cluster.arn
-  version  = "1.27"
+  version  = "1.32"
 
   vpc_config {
     subnet_ids = var.private_subnets

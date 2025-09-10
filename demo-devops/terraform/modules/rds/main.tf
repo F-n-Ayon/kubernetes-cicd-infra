@@ -26,32 +26,18 @@ variable "db_name" {
 variable "db_username" {
   description = "Database username"
   type        = string
-  sensitive   = true
 }
 
 variable "db_password" {
-  description = "Database password (optional - will generate if not provided)"
+  description = "Database password"
   type        = string
   sensitive   = true
-  default     = ""
 }
 
 variable "db_instance_class" {
   description = "Database instance class"
   type        = string
   default     = "db.t3.micro"
-}
-
-# Generate random password if not provided
-resource "random_password" "db_password" {
-  count           = var.db_password == "" ? 1 : 0
-  length          = 16
-  special         = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
-
-locals {
-  final_db_password = var.db_password != "" ? var.db_password : random_password.db_password[0].result
 }
 
 resource "aws_db_subnet_group" "main" {
@@ -100,7 +86,7 @@ resource "aws_db_instance" "main" {
   
   db_name                 = var.db_name
   username                = var.db_username
-  password                = local.final_db_password
+  password                = var.db_password
   
   db_subnet_group_name    = aws_db_subnet_group.main.name
   vpc_security_group_ids  = [aws_security_group.rds.id]
@@ -133,49 +119,12 @@ resource "aws_kms_key" "rds" {
   }
 }
 
-resource "aws_secretsmanager_secret" "db_credentials" {
-  name                    = "${var.cluster_name}/database"
-  description             = "Database credentials for ${var.cluster_name}"
-  recovery_window_in_days = 0
-
-  tags = {
-    Environment = var.environment
-    Terraform   = "true"
-  }
-}
-
-resource "aws_secretsmanager_secret_version" "db_credentials" {
-  secret_id = aws_secretsmanager_secret.db_credentials.id
-  secret_string = jsonencode({
-    username = aws_db_instance.main.username
-    password = aws_db_instance.main.password
-    engine   = "postgres"
-    host     = aws_db_instance.main.address
-    port     = aws_db_instance.main.port
-    dbname   = aws_db_instance.main.db_name
-  })
-}
-
 output "db_instance_id" {
   description = "The ID of the RDS instance"
   value       = aws_db_instance.main.id
-  sensitive   = false
 }
 
 output "db_instance_endpoint" {
   description = "The connection endpoint for the RDS instance"
   value       = aws_db_instance.main.endpoint
-  sensitive   = false
-}
-
-output "db_secret_arn" {
-  description = "The ARN of the Secrets Manager secret"
-  value       = aws_secretsmanager_secret.db_credentials.arn
-  sensitive   = false
-}
-
-output "db_password" {
-  description = "The database password (for reference)"
-  value       = aws_db_instance.main.password
-  sensitive   = true
 }
