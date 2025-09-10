@@ -26,7 +26,7 @@ demo-devops/
 
 ### Components
 
-- **AWS EKS Cluster**: Managed Kubernetes cluster (v1.27) in private subnets
+- **AWS EKS Cluster**: Managed Kubernetes cluster (v1.32) in private subnets
 - **AWS RDS PostgreSQL**: Managed database (v15.2) with encryption
 - **AWS Secrets Manager**: Secure credential storage
 - **VPC Networking**: Isolated network environment
