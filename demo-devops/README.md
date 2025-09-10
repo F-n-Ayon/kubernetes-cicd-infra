@@ -22,7 +22,8 @@ demo-devops/
 └── README.md
 ```
 ## 🏗️ Architecture
-<img width="1167" height="317" alt="image" src="https://github.com/user-attachments/assets/38f9c514-2c98-4dd5-9c5d-e24503a8a9d8" />
+<img width="3876" height="1349" alt="image" src="https://github.com/user-attachments/assets/7f8fcb9b-f6ec-4a2d-a00b-91ff0a3fd579" />
+
 
 ### Components
 
